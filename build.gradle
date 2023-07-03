@@ -1,0 +1,68 @@
+plugins {
+    id "groovy"
+}
+
+group = "com.eddgrant"
+version = "1.0-SNAPSHOT"
+
+project.ext {
+    jobDslVersion = "1.82"
+    jenkinsVersion = "2.384"
+    jenkinsTestHarnessVersion = "2002.v0b_78b_a_d69e5d"
+}
+
+repositories {
+    maven { url "https://repo.jenkins-ci.org/releases/" }
+    maven { url "https://repo.jenkins-ci.org/public/" }
+    jcenter()
+    mavenCentral()
+}
+
+dependencies {
+    /**
+     * Jenkins currently relies on Groovy 2.5, as detailed in https://issues.jenkins.io/browse/JENKINS-51823.
+     * So we target the same version despite it being rather old.
+     */
+    implementation "org.codehaus.groovy:groovy-all:2.5.+"
+    testImplementation platform("org.junit:junit-bom:5.9.1")
+    testImplementation "org.junit.jupiter:junit-jupiter"
+    testImplementation "org.spockframework:spock-core:2.3-groovy-2.5"
+    testImplementation "ru.vyarus:spock-junit5:1.2.0"
+
+    testImplementation 'org.slf4j:slf4j-simple:2.0.7'
+
+    // Jenkins dependencies:
+    testImplementation "org.jenkins-ci.main:jenkins-test-harness:2002.v0b_78b_a_d69e5d"
+
+    // jenkins-test-harness doesn't declare a dependency on Jenkins itself so we do that here.
+    testImplementation "org.jenkins-ci.main:jenkins-core:${jenkinsVersion}"
+
+    /**
+     * HELP!
+     *
+     * The `packaging` element in job-dsl's pom.xml is set to "hpi". If we omit '@jar' here then
+     * Gradle will pull in the .hpi artefact, which is of no use to us, and Gradle will also
+     * pull in all of the project's transitive dependencies, which _are_ of use to us.
+     *
+     * However, if, by specifying '@jar', we tell Gradle that we specifically want the .jar artefact then
+     * it no longer seems to pull any of the transitive dependencies. This is a pain
+     * as we rely on them to compile successfully.
+     */
+    testImplementation "org.jenkins-ci.plugins:job-dsl:${jobDslVersion}@jar"
+
+    /* HELP!
+     *
+     * job-dsl-core is a transitive dependency of job-dsl, but we have to pull it in manually
+     * if we specify the @jar artefact of job-dsl. Why is this?
+     *
+     * Uncomment the line below and the BasicSpec test should compile and pass.
+     */
+    //testImplementation "org.jenkins-ci.plugins:job-dsl-core:${jobDslVersion}@jar"
+}
+
+test {
+    useJUnitPlatform()
+    testLogging {
+        showStandardStreams true
+    }
+}
