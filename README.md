@@ -24,3 +24,8 @@ This is demonstrated as follows:
 6. Question: Is there a way I can tell Gradle to download the `job-dsl` `jar` artefact _and_ to also download all of its transitive dependencies?
 
 Very grateful for any help on this one!
+
+## Solution
+
+* The initial problem is demonstrated in commit [ec26bbfcee8b8deac1ffee55b743ce8813d5ad22](https://github.com/eddgrant/gradle-jenkins-dependency-resolution/commit/ec26bbfcee8b8deac1ffee55b743ce8813d5ad22).
+* The solution that I came up with in the end is in commit [7e52381f11801b810327347ff627455074cbf034](https://github.com/eddgrant/gradle-jenkins-dependency-resolution/commit/36447721e4faa364a60ec79ee765ccd775ed7901). This was inspired from help received on the Gradle forum [here](https://discuss.gradle.org/t/how-can-i-specify-a-dependency-file-extension-and-still-have-gradle-resolve-transitive-dependencies/45956/4)

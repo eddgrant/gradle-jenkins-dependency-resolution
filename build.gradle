@@ -20,6 +20,52 @@ repositories {
 
 dependencies {
     /**
+     * The packaging element in job-dsl's pom.xml is set to "hpi", which is of no use to us
+     * when running unit tests as it doesn't contain various classes we need to have on our classpath.
+     *
+     * We do however need the .hpi files when running AbstractJobSpec tests as we need to provide them to the
+     * in-memory Jenkins instance so that it can load and verify them, then make them available when we apply
+     * the DSL files in the "jobs" folder.
+     *
+     * We tried specifying '@jar' on each Jenkins plugin dependency, however this stopped Gradle from including any of
+     * the dependency's transitive dependencies, which caused various class loading issues e.g NoClassDefFound exceptions
+     * which didn't occur until certain bits of DSL were processed.
+     *
+     * We then discovered that we can tell Gradle to add the .jar and .hpi artefacts for Jenkins plugins when it does the dependency resolution.
+     * This gives us access to both of the artefacts that we need and yet doesn't stop Gradle
+     * from pulling in the transitive dependencies of the dependency itself.
+     *
+     * This approach, however, requires some careful curation: Both in identifying the groupIds of all Jenkins plugins
+     * and maintaining a list of plugins which, for some reason, don't publish a .hpi artefact.
+     *
+     * Further reading here: https://discuss.gradle.org/t/how-can-i-specify-a-dependency-file-extension-and-still-have-gradle-resolve-transitive-dependencies/45956/2
+     */
+    components {
+        all { ComponentMetadataDetails cmd ->
+            final Set<String> jenkinsPluginGroups = [
+                "io.jenkins.plugins",
+                "org.jenkins-ci.plugins",
+                "org.jenkinsci.plugins",
+                "com.cloudbees.jenkins.plugins"
+            ]
+            final Set<String> pluginsThatDoNotPublishAnHpiArtefact = [
+                "job-dsl-core",
+                "lib-durable-task"
+            ]
+            if(jenkinsPluginGroups.contains(cmd.id.id.group)) {
+                allVariants {
+                    withFiles {
+                        addFile("${id.name}-${id.version}.jar")
+                        if(!pluginsThatDoNotPublishAnHpiArtefact.contains(id.name)) {
+                            addFile("${id.name}-${id.version}.hpi")
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
      * Jenkins currently relies on Groovy 2.5, as detailed in https://issues.jenkins.io/browse/JENKINS-51823.
      * So we target the same version despite it being rather old.
      */
@@ -37,27 +83,7 @@ dependencies {
     // jenkins-test-harness doesn't declare a dependency on Jenkins itself so we do that here.
     testImplementation "org.jenkins-ci.main:jenkins-core:${jenkinsVersion}"
 
-    /**
-     * HELP!
-     *
-     * The `packaging` element in job-dsl's pom.xml is set to "hpi". If we omit '@jar' here then
-     * Gradle will pull in the .hpi artefact, which is of no use to us, and Gradle will also
-     * pull in all of the project's transitive dependencies, which _are_ of use to us.
-     *
-     * However, if, by specifying '@jar', we tell Gradle that we specifically want the .jar artefact then
-     * it no longer seems to pull any of the transitive dependencies. This is a pain
-     * as we rely on them to compile successfully.
-     */
-    testImplementation "org.jenkins-ci.plugins:job-dsl:${jobDslVersion}@jar"
-
-    /* HELP!
-     *
-     * job-dsl-core is a transitive dependency of job-dsl, but we have to pull it in manually
-     * if we specify the @jar artefact of job-dsl. Why is this?
-     *
-     * Uncomment the line below and the BasicSpec test should compile and pass.
-     */
-    //testImplementation "org.jenkins-ci.plugins:job-dsl-core:${jobDslVersion}@jar"
+    testImplementation "org.jenkins-ci.plugins:job-dsl:${jobDslVersion}"
 }
 
 test {
