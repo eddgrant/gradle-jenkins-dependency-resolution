@@ -75,7 +75,7 @@ dependencies {
     testImplementation "org.spockframework:spock-core:2.3-groovy-2.5"
     testImplementation "ru.vyarus:spock-junit5:1.2.0"
 
-    testImplementation 'org.slf4j:slf4j-simple:2.0.7'
+    testImplementation 'org.slf4j:slf4j-simple:2.0.16'
 
     // Jenkins dependencies:
     testImplementation "org.jenkins-ci.main:jenkins-test-harness:2002.v0b_78b_a_d69e5d"
