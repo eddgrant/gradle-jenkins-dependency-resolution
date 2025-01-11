@@ -7,7 +7,7 @@ version = "1.0-SNAPSHOT"
 
 project.ext {
     jobDslVersion = "1.82"
-    jenkinsVersion = "2.384"
+    jenkinsVersion = "2.492"
     jenkinsTestHarnessVersion = "2002.v0b_78b_a_d69e5d"
 }
 
