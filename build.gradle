@@ -6,7 +6,7 @@ group = "com.eddgrant"
 version = "1.0-SNAPSHOT"
 
 project.ext {
-    jobDslVersion = "1.82"
+    jobDslVersion = "1.90"
     jenkinsVersion = "2.384"
     jenkinsTestHarnessVersion = "2002.v0b_78b_a_d69e5d"
 }
