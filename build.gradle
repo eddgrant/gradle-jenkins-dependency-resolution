@@ -78,7 +78,7 @@ dependencies {
     testImplementation 'org.slf4j:slf4j-simple:2.0.7'
 
     // Jenkins dependencies:
-    testImplementation "org.jenkins-ci.main:jenkins-test-harness:2002.v0b_78b_a_d69e5d"
+    testImplementation "org.jenkins-ci.main:jenkins-test-harness:2478.v665cca_da_f20c"
 
     // jenkins-test-harness doesn't declare a dependency on Jenkins itself so we do that here.
     testImplementation "org.jenkins-ci.main:jenkins-core:${jenkinsVersion}"
