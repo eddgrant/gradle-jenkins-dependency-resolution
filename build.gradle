@@ -70,7 +70,7 @@ dependencies {
      * So we target the same version despite it being rather old.
      */
     implementation "org.codehaus.groovy:groovy-all:2.5.+"
-    testImplementation platform("org.junit:junit-bom:5.9.1")
+    testImplementation platform("org.junit:junit-bom:5.14.0")
     testImplementation "org.junit.jupiter:junit-jupiter"
     testImplementation "org.spockframework:spock-core:2.3-groovy-2.5"
     testImplementation "ru.vyarus:spock-junit5:1.2.0"
